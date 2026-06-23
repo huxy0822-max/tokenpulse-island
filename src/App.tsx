@@ -52,7 +52,10 @@ async function loadSummary(): Promise<TokenSummary> {
   const response = await fetch(`/api/summary?ts=${Date.now()}`, {
     headers: { accept: "application/json" }
   });
-  if (!response.ok) throw new Error(`summary api ${response.status}`);
+  const contentType = response.headers.get("content-type") || "";
+  if (!response.ok || !contentType.includes("application/json")) {
+    throw new Error(`summary api unavailable ${response.status}`);
+  }
   const data = (await response.json()) as TokenSummary;
   if (!data.ok) throw new Error("summary api returned not ok");
   return data;
@@ -362,4 +365,3 @@ function LocalBridge({ summary }: { summary: TokenSummary }) {
     </section>
   );
 }
-
