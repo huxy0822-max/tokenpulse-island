@@ -389,6 +389,11 @@ const server = http.createServer(async (req, res) => {
   serveStatic(req, res, url);
 });
 
+server.on("error", (error) => {
+  console.error(`TokenPulse Island failed to listen on ${port}:`, error);
+});
+
+console.log(`TokenPulse Island starting with dist=${dist}`);
 server.listen(port, "0.0.0.0", () => {
   console.log(`TokenPulse Island running at http://127.0.0.1:${port}`);
 });
