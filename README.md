@@ -1,6 +1,6 @@
 # OpenToken 反馈小岛
 
-这是我们自己的 OpenToken 反馈小岛版本。它会把本机 OpenToken 使用量变成一个右上角菜单栏小插件：显示折算 Token、排名压力、任务、成就、工具占比、7 日节奏和公开仓库行为信号。
+这是我们自己的 OpenToken 反馈小岛版本。它会把本机 OpenToken 使用量变成一个右上角菜单栏小插件：显示榜单 Token、排名压力、任务、成就、工具占比、7 日节奏和公开仓库行为信号。
 
 这个项目是在阅读 `ehomekevin/opentoken-island` 之后从零写的。上游仓库没有声明许可证，所以本仓库不复用它的代码。
 
@@ -33,6 +33,12 @@ npm start
 
 ```bash
 OPENTOKEN_BIN=/Users/huxy/.local/bin/opentoken npm start
+```
+
+如果要稳定匹配公开榜单排名，建议指定公开榜单里的 userId：
+
+```bash
+TOKENPULSE_USER_ID=173130 npm start
 ```
 
 ## macOS 菜单栏小插件

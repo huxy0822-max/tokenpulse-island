@@ -115,7 +115,7 @@ function groupByDate(rows) {
     current.input += input;
     current.output += output;
     current.cache += cache;
-    current.byTool[row.tool || "unknown"] = (current.byTool[row.tool || "unknown"] || 0) + normalized;
+    current.byTool[row.tool || "unknown"] = (current.byTool[row.tool || "unknown"] || 0) + raw;
     map.set(date, current);
   }
   return [...map.values()].sort((a, b) => a.date.localeCompare(b.date));
@@ -149,7 +149,7 @@ function colorAt(index) {
 function calculateStreak(days) {
   let streak = 0;
   for (let index = days.length - 1; index >= 0; index -= 1) {
-    if (days[index].normalized <= 0) break;
+    if (days[index].raw <= 0) break;
     streak += 1;
   }
   return streak;
@@ -161,12 +161,12 @@ function buildQuests(current, rankData, tools) {
 
   return [
     {
-      title: current.normalized >= dailyTarget ? "守住 3 亿线" : "冲刺 3 亿",
-      detail: current.normalized >= dailyTarget
-        ? `已超过目标 ${formatCount(current.normalized - dailyTarget)}`
-        : `还差 ${formatCount(dailyTarget - current.normalized)}折算 Token`,
-      reward: current.normalized >= dailyTarget ? "已完成" : "+620 经验",
-      done: current.normalized >= dailyTarget,
+      title: current.raw >= dailyTarget ? "守住 3 亿线" : "冲刺 3 亿",
+      detail: current.raw >= dailyTarget
+        ? `已超过目标 ${formatCount(current.raw - dailyTarget)}`
+        : `还差 ${formatCount(dailyTarget - current.raw)}榜单 Token`,
+      reward: current.raw >= dailyTarget ? "已完成" : "+620 经验",
+      done: current.raw >= dailyTarget,
       tone: "green"
     },
     {
@@ -207,8 +207,8 @@ function buildBadges(current, rankData, streak, tools) {
     },
     {
       title: "高产输出",
-      detail: `${formatCount(current.normalized)} / 3.00亿`,
-      unlocked: current.normalized >= 300_000_000,
+      detail: `${formatCount(current.raw)} / 3.00亿`,
+      unlocked: current.raw >= 300_000_000,
       icon: "flame"
     },
     {
@@ -222,13 +222,13 @@ function buildBadges(current, rankData, streak, tools) {
 
 function buildTools(current) {
   const entries = Object.entries(current.byTool || {}).sort((a, b) => b[1] - a[1]);
-  const total = Math.max(1, current.normalized);
-  return entries.slice(0, 5).map(([id, normalized], index) => ({
+  const total = Math.max(1, current.raw);
+  return entries.slice(0, 5).map(([id, score], index) => ({
     id,
     label: toolLabel(id),
-    normalized,
-    raw: normalized,
-    share: normalized / total,
+    normalized: score,
+    raw: score,
+    share: score / total,
     color: colorAt(index),
     icon: toolIcon(id)
   }));
@@ -258,13 +258,20 @@ function requestJson(url) {
 async function loadRank(current) {
   const data = await requestJson("https://scys.com/tokenrank/api/subapp/leaderboard?board=total&range=today&limit=500");
   const entries = Array.isArray(data?.entries) ? data.entries : [];
-  const match = entries.find((entry) => Number(entry.score || 0) === Number(current.normalized || 0));
+  const configuredUserId = Number(process.env.TOKENPULSE_USER_ID || 0);
+  const configuredUserName = (process.env.TOKENPULSE_USER_NAME || "").trim();
+  const match =
+    (configuredUserId ? entries.find((entry) => Number(entry.userId || 0) === configuredUserId) : null) ||
+    (configuredUserName ? entries.find((entry) => entry.name === configuredUserName) : null) ||
+    entries.find((entry) => Number(entry.score || 0) === Number(current.raw || 0));
   if (!match) return null;
   const index = entries.findIndex((entry) => entry === match);
   const previous = entries[index - 1] || null;
   const next = entries[index + 1] || null;
   return {
     rank: Number(match.rank || index + 1),
+    score: Number(match.score || 0),
+    name: match.name || "",
     gap: previous ? Math.max(0, Number(previous.score || 0) - Number(match.score || 0) + 1) : 0,
     lead: next ? Math.max(0, Number(match.score || 0) - Number(next.score || 0)) : 0
   };
@@ -292,12 +299,12 @@ async function buildSummary() {
   const tools = buildTools(current);
   const streak = calculateStreak(days);
   const levelSize = 25_000_000;
-  const xp = current.normalized % levelSize;
+  const xp = current.raw % levelSize;
   const primary = tools[0];
   const history = days.slice(-7).map((day) => ({
     date: day.date,
     label: day.date === current.date ? "今天" : day.date.slice(5).replace("-", "/"),
-    normalized: day.normalized
+    normalized: day.raw
   }));
 
   return {
@@ -305,21 +312,21 @@ async function buildSummary() {
     mode: "local",
     generatedAt: new Date().toISOString(),
     date: current.date,
-    sourceNote: `来自 ${path.basename(bin)} 预览`,
+    sourceNote: rankData?.rank ? `来自 ${path.basename(bin)} 预览，已匹配生财榜单` : `来自 ${path.basename(bin)} 预览，未匹配榜单`,
     normalized: current.normalized,
     raw: current.raw,
     input: current.input,
     output: current.output,
     cache: current.cache,
-    totalLabel: formatCount(current.normalized),
+    totalLabel: formatCount(current.raw),
     rawLabel: formatCount(current.raw),
     rank: rankData?.rank || null,
     rankLabel: rankData?.rank ? `#${rankData.rank}` : "#--",
     gapLabel: rankData?.gap ? formatCount(rankData.gap) : "",
     leadLabel: rankData?.lead ? formatCount(rankData.lead) : "",
     rankDelta: 0,
-    level: Math.max(1, Math.floor(current.normalized / levelSize) + 1),
-    levelTitle: `建造者等级 ${Math.max(1, Math.floor(current.normalized / levelSize) + 1)}`,
+    level: Math.max(1, Math.floor(current.raw / levelSize) + 1),
+    levelTitle: `建造者等级 ${Math.max(1, Math.floor(current.raw / levelSize) + 1)}`,
     xp,
     xpMax: levelSize,
     xpPct: Math.max(4, Math.round((xp / levelSize) * 100)),

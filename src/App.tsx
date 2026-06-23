@@ -145,10 +145,10 @@ export default function App() {
 
 function StatusRail({ summary }: { summary: TokenSummary }) {
   const metricItems = [
-    { label: "折算 Token", value: summary.totalLabel, detail: summary.date, icon: "activity" },
+    { label: "榜单 Token", value: summary.totalLabel, detail: summary.date, icon: "activity" },
     { label: "排名", value: summary.rankLabel, detail: summary.gapLabel ? `差 ${summary.gapLabel}` : "等待榜单", icon: "trophy" },
     { label: "专注", value: String(summary.focusScore), detail: `${summary.streak} 天连续`, icon: "gauge" },
-    { label: "原始 Token", value: summary.rawLabel, detail: "含缓存", icon: "terminal" }
+    { label: "新输入输出", value: formatCount(summary.normalized), detail: "不含缓存", icon: "terminal" }
   ];
 
   return (
@@ -168,6 +168,7 @@ function StatusRail({ summary }: { summary: TokenSummary }) {
 }
 
 function IslandPulse({ summary, range }: { summary: TokenSummary; range: "today" | "week" }) {
+  const totalCopy = summary.totalLabel === "未连接" ? summary.totalLabel : `${summary.totalLabel} Token`;
   const rankCopy =
     summary.rank === 1
       ? `守住第 1，领先 ${summary.leadLabel || "0"}`
@@ -183,7 +184,7 @@ function IslandPulse({ summary, range }: { summary: TokenSummary; range: "today"
           <span className="live-dot" />
           <div>
             <p>{range === "today" ? "今日反馈" : "7 日反馈"}</p>
-            <h2>{summary.totalLabel} Token</h2>
+            <h2>{totalCopy}</h2>
           </div>
         </div>
         <div className="island-right">
@@ -257,7 +258,7 @@ function ToolShare({ tools }: { tools: ToolSignal[] }) {
       <div className="section-title">
         <div>
           <h2>工具占比</h2>
-          <p>折算贡献</p>
+          <p>榜单贡献</p>
         </div>
         <Bot size={19} />
       </div>
