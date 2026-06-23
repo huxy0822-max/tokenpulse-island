@@ -36,7 +36,7 @@ final class TokenPulseAppDelegate: NSObject, NSApplicationDelegate, WKNavigation
 
         button.image = NSImage(
             systemSymbolName: "chart.line.uptrend.xyaxis",
-            accessibilityDescription: "TokenPulse Island"
+            accessibilityDescription: "OpenToken 反馈小岛"
         )
         button.imagePosition = .imageLeft
         button.title = " --"
@@ -47,21 +47,21 @@ final class TokenPulseAppDelegate: NSObject, NSApplicationDelegate, WKNavigation
         rightClick.buttonMask = 0x2
         button.addGestureRecognizer(rightClick)
 
-        let openItem = NSMenuItem(title: "Open Local Dashboard", action: #selector(openDashboard), keyEquivalent: "o")
+        let openItem = NSMenuItem(title: "打开本地面板", action: #selector(openDashboard), keyEquivalent: "o")
         openItem.target = self
         contextMenu.addItem(openItem)
 
-        let refreshItem = NSMenuItem(title: "Refresh", action: #selector(refreshNow), keyEquivalent: "r")
+        let refreshItem = NSMenuItem(title: "刷新", action: #selector(refreshNow), keyEquivalent: "r")
         refreshItem.target = self
         contextMenu.addItem(refreshItem)
 
-        let restartItem = NSMenuItem(title: "Restart Local Service", action: #selector(restartService), keyEquivalent: "s")
+        let restartItem = NSMenuItem(title: "重启本地服务", action: #selector(restartService), keyEquivalent: "s")
         restartItem.target = self
         contextMenu.addItem(restartItem)
 
         contextMenu.addItem(.separator())
 
-        let quitItem = NSMenuItem(title: "Quit TokenPulse Island", action: #selector(quit), keyEquivalent: "q")
+        let quitItem = NSMenuItem(title: "退出 OpenToken 反馈小岛", action: #selector(quit), keyEquivalent: "q")
         quitItem.target = self
         contextMenu.addItem(quitItem)
     }
@@ -131,7 +131,7 @@ final class TokenPulseAppDelegate: NSObject, NSApplicationDelegate, WKNavigation
                 ok
             else {
                 DispatchQueue.main.async {
-                    self.statusItem.button?.title = " offline"
+                    self.statusItem.button?.title = " 离线"
                 }
                 return
             }
@@ -163,4 +163,3 @@ let app = NSApplication.shared
 let delegate = TokenPulseAppDelegate()
 app.delegate = delegate
 app.run()
-

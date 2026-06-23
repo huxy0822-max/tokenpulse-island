@@ -23,10 +23,10 @@ const mime = {
 };
 
 const demoSignals = [
-  { label: "Star", value: "0", detail: "原型仍在冷启动", tone: "amber" },
-  { label: "Issue", value: "0", detail: "还没有配置问题暴露", tone: "blue" },
-  { label: "PR", value: "0", detail: "暂无外部共建", tone: "rose" },
-  { label: "Install", value: "local", detail: "本机可接 OpenToken 预览", tone: "green" }
+  { label: "星标", value: "0", detail: "原型仍在冷启动", tone: "amber" },
+  { label: "问题", value: "0", detail: "还没有配置问题暴露", tone: "blue" },
+  { label: "共建", value: "0", detail: "暂无外部共建", tone: "rose" },
+  { label: "安装", value: "本机", detail: "本机可接 OpenToken 预览", tone: "green" }
 ];
 
 function json(res, status, body) {
@@ -164,8 +164,8 @@ function buildQuests(current, rankData, tools) {
       title: current.normalized >= dailyTarget ? "守住 3 亿线" : "冲刺 3 亿",
       detail: current.normalized >= dailyTarget
         ? `已超过目标 ${formatCount(current.normalized - dailyTarget)}`
-        : `还差 ${formatCount(dailyTarget - current.normalized)} normalized token`,
-      reward: current.normalized >= dailyTarget ? "done" : "+620 XP",
+        : `还差 ${formatCount(dailyTarget - current.normalized)}折算 Token`,
+      reward: current.normalized >= dailyTarget ? "已完成" : "+620 经验",
       done: current.normalized >= dailyTarget,
       tone: "green"
     },
@@ -176,14 +176,14 @@ function buildQuests(current, rankData, tools) {
         : rankData?.rank
           ? `当前差距 ${formatCount(rankData.gap || 0)}`
           : "本地预览未匹配公开榜单",
-      reward: rankData?.rank === 1 ? "done" : rankData?.rank ? "+800 XP" : "+0 XP",
+      reward: rankData?.rank === 1 ? "已完成" : rankData?.rank ? "+800 经验" : "+0 经验",
       done: rankData?.rank === 1,
       tone: "blue"
     },
     {
       title: "主力工具稳定",
       detail: primary ? `${primary.label} 占比 ${formatPercent(primary.share)}` : "等待工具数据",
-      reward: primary && primary.share >= 0.6 ? "done" : "+240 XP",
+      reward: primary && primary.share >= 0.6 ? "已完成" : "+240 经验",
       done: Boolean(primary && primary.share >= 0.6),
       tone: "amber"
     }
@@ -194,25 +194,25 @@ function buildBadges(current, rankData, streak, tools) {
   const primary = tools[0];
   return [
     {
-      title: "Codex Main",
+      title: "Codex 主力",
       detail: primary ? `${primary.label} ${formatPercent(primary.share)}` : "等待工具数据",
       unlocked: Boolean(primary && primary.share >= 0.6),
       icon: primary?.icon || "zap"
     },
     {
-      title: "Rank Climber",
+      title: "排名攀升",
       detail: rankData?.rank ? `当前 #${rankData.rank}` : "等待榜单匹配",
       unlocked: Boolean(rankData?.rank && rankData.rank <= 10),
       icon: "trending-up"
     },
     {
-      title: "High Output",
+      title: "高产输出",
       detail: `${formatCount(current.normalized)} / 3.00亿`,
       unlocked: current.normalized >= 300_000_000,
       icon: "flame"
     },
     {
-      title: "Week Loop",
+      title: "七日循环",
       detail: `${streak} 天连续`,
       unlocked: streak >= 7,
       icon: "calendar-check"
@@ -275,10 +275,10 @@ async function githubSignals() {
   if (!repo || typeof repo !== "object") return demoSignals;
 
   return [
-    { label: "Star", value: String(repo.stargazers_count ?? 0), detail: "公开仓库关注", tone: "amber" },
-    { label: "Issue", value: String(repo.open_issues_count ?? 0), detail: "包含 issue 和 PR", tone: "blue" },
-    { label: "Fork", value: String(repo.forks_count ?? 0), detail: "外部复制意愿", tone: "rose" },
-    { label: "License", value: repo.license?.spdx_id || "none", detail: "复用边界", tone: "green" }
+    { label: "星标", value: String(repo.stargazers_count ?? 0), detail: "公开仓库关注", tone: "amber" },
+    { label: "问题", value: String(repo.open_issues_count ?? 0), detail: "包含问题和拉取请求", tone: "blue" },
+    { label: "复刻", value: String(repo.forks_count ?? 0), detail: "外部复制意愿", tone: "rose" },
+    { label: "许可", value: repo.license?.spdx_id || "无", detail: "复用边界", tone: "green" }
   ];
 }
 
@@ -305,7 +305,7 @@ async function buildSummary() {
     mode: "local",
     generatedAt: new Date().toISOString(),
     date: current.date,
-    sourceNote: `preview from ${path.basename(bin)}`,
+    sourceNote: `来自 ${path.basename(bin)} 预览`,
     normalized: current.normalized,
     raw: current.raw,
     input: current.input,
@@ -319,13 +319,13 @@ async function buildSummary() {
     leadLabel: rankData?.lead ? formatCount(rankData.lead) : "",
     rankDelta: 0,
     level: Math.max(1, Math.floor(current.normalized / levelSize) + 1),
-    levelTitle: `Builder Lv. ${Math.max(1, Math.floor(current.normalized / levelSize) + 1)}`,
+    levelTitle: `建造者等级 ${Math.max(1, Math.floor(current.normalized / levelSize) + 1)}`,
     xp,
     xpMax: levelSize,
     xpPct: Math.max(4, Math.round((xp / levelSize) * 100)),
     streak,
     focusScore: Math.min(99, Math.round((current.output / Math.max(1, current.input + current.output)) * 160 + streak * 4)),
-    primaryTool: primary?.label || "Waiting",
+    primaryTool: primary?.label || "等待数据",
     primaryToolShareLabel: primary ? formatPercent(primary.share) : "0%",
     tools,
     quests: buildQuests(current, rankData, tools),

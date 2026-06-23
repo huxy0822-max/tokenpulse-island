@@ -7,9 +7,9 @@
   <key>CFBundleIdentifier</key>
   <string>com.huxy.tokenpulse-island.app</string>
   <key>CFBundleName</key>
-  <string>TokenPulse Island</string>
+  <string>OpenToken 反馈小岛</string>
   <key>CFBundleDisplayName</key>
-  <string>TokenPulse Island</string>
+  <string>OpenToken 反馈小岛</string>
   <key>CFBundlePackageType</key>
   <string>APPL</string>
   <key>CFBundleShortVersionString</key>
@@ -27,4 +27,3 @@
   </dict>
 </dict>
 </plist>
-

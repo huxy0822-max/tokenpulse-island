@@ -97,13 +97,13 @@ export default function App() {
             <Radio size={22} />
           </div>
           <div>
-            <h1>TokenPulse Island</h1>
+            <h1>OpenToken 反馈小岛</h1>
             <p>OpenToken 即时反馈层</p>
           </div>
         </div>
 
         <div className="top-actions">
-          <div className="segmented" aria-label="range selector">
+          <div className="segmented" aria-label="时间范围">
             <button className={range === "today" ? "active" : ""} onClick={() => setRange("today")}>
               今日
             </button>
@@ -111,7 +111,7 @@ export default function App() {
               7 日
             </button>
           </div>
-          <button className="icon-button" aria-label="Refresh data" onClick={refresh} disabled={loading}>
+          <button className="icon-button" aria-label="刷新数据" onClick={refresh} disabled={loading}>
             {loading ? <Loader2 className="spin" size={18} /> : <RefreshCcw size={18} />}
           </button>
           <button className="primary-action" onClick={() => setPulse((value) => value + 1)}>
@@ -145,14 +145,14 @@ export default function App() {
 
 function StatusRail({ summary }: { summary: TokenSummary }) {
   const metricItems = [
-    { label: "Normalized", value: summary.totalLabel, detail: summary.date, icon: "activity" },
-    { label: "Rank", value: summary.rankLabel, detail: summary.gapLabel ? `差 ${summary.gapLabel}` : "等待榜单", icon: "trophy" },
-    { label: "Focus", value: String(summary.focusScore), detail: `${summary.streak} 天连续`, icon: "gauge" },
-    { label: "Raw", value: summary.rawLabel, detail: "含 cache", icon: "terminal" }
+    { label: "折算 Token", value: summary.totalLabel, detail: summary.date, icon: "activity" },
+    { label: "排名", value: summary.rankLabel, detail: summary.gapLabel ? `差 ${summary.gapLabel}` : "等待榜单", icon: "trophy" },
+    { label: "专注", value: String(summary.focusScore), detail: `${summary.streak} 天连续`, icon: "gauge" },
+    { label: "原始 Token", value: summary.rawLabel, detail: "含缓存", icon: "terminal" }
   ];
 
   return (
-    <section className="status-grid" aria-label="current status">
+    <section className="status-grid" aria-label="当前状态">
       {metricItems.map((item) => (
         <div className="metric-panel" key={item.label}>
           <div className="metric-head">
@@ -176,14 +176,14 @@ function IslandPulse({ summary, range }: { summary: TokenSummary; range: "today"
         : "等待榜单匹配";
 
   return (
-    <section className="island-stage" aria-label="feedback island">
+    <section className="island-stage" aria-label="反馈小岛">
       <div className="ambient-lines" aria-hidden="true" />
       <div className="island-card">
         <div className="island-left">
           <span className="live-dot" />
           <div>
             <p>{range === "today" ? "今日反馈" : "7 日反馈"}</p>
-            <h2>{summary.totalLabel} token</h2>
+            <h2>{summary.totalLabel} Token</h2>
           </div>
         </div>
         <div className="island-right">
@@ -193,9 +193,9 @@ function IslandPulse({ summary, range }: { summary: TokenSummary; range: "today"
       </div>
       <div className="pulse-copy">
         <p>{rankCopy}</p>
-        <span>{summary.levelTitle} · XP {formatPercent(summary.xp / Math.max(1, summary.xpMax))}</span>
+        <span>{summary.levelTitle} · 经验 {formatPercent(summary.xp / Math.max(1, summary.xpMax))}</span>
       </div>
-      <div className="xp-track" aria-label="XP progress">
+      <div className="xp-track" aria-label="经验进度">
         <i style={{ width: `${summary.xpPct}%` }} />
       </div>
     </section>
@@ -208,9 +208,9 @@ function RhythmChart({ summary, maxHistory }: { summary: TokenSummary; maxHistor
       <div className="section-title">
         <div>
           <h2>7 日节奏</h2>
-          <p>{summary.mode === "local" ? "来自本机 OpenToken" : "demo fallback"}</p>
+          <p>{summary.mode === "local" ? "来自本机 OpenToken" : "演示数据"}</p>
         </div>
-        <span className={`mode-pill ${summary.mode}`}>{summary.mode}</span>
+        <span className={`mode-pill ${summary.mode}`}>{summary.mode === "local" ? "本机" : "演示"}</span>
       </div>
       <div className="bars">
         {summary.history.map((point) => (
@@ -257,7 +257,7 @@ function ToolShare({ tools }: { tools: ToolSignal[] }) {
       <div className="section-title">
         <div>
           <h2>工具占比</h2>
-          <p>normalized 贡献</p>
+          <p>折算贡献</p>
         </div>
         <Bot size={19} />
       </div>
@@ -346,19 +346,19 @@ function LocalBridge({ summary }: { summary: TokenSummary }) {
       </div>
       <div className="bridge-grid">
         <div>
-          <span>Input</span>
+          <span>输入</span>
           <strong>{formatCount(summary.input)}</strong>
         </div>
         <div>
-          <span>Output</span>
+          <span>输出</span>
           <strong>{formatCount(summary.output)}</strong>
         </div>
         <div>
-          <span>Cache</span>
+          <span>缓存</span>
           <strong>{formatCount(summary.cache)}</strong>
         </div>
         <div>
-          <span>Main</span>
+          <span>主力</span>
           <strong>{summary.primaryToolShareLabel}</strong>
         </div>
       </div>
