@@ -220,9 +220,10 @@ function buildBadges(current, rankData, streak, tools) {
   ];
 }
 
-function buildTools(current) {
-  const entries = Object.entries(current.byTool || {}).sort((a, b) => b[1] - a[1]);
-  const total = Math.max(1, current.raw);
+function buildTools(current, rankData) {
+  const byTool = rankData?.byTool || current.byTool || {};
+  const entries = Object.entries(byTool).sort((a, b) => b[1] - a[1]);
+  const total = Math.max(1, rankData?.score || current.raw);
   return entries.slice(0, 5).map(([id, score], index) => ({
     id,
     label: toolLabel(id),
@@ -272,6 +273,7 @@ async function loadRank(current) {
     rank: Number(match.rank || index + 1),
     score: Number(match.score || 0),
     name: match.name || "",
+    byTool: match.byTool || null,
     gap: previous ? Math.max(0, Number(previous.score || 0) - Number(match.score || 0) + 1) : 0,
     lead: next ? Math.max(0, Number(match.score || 0) - Number(next.score || 0)) : 0
   };
@@ -296,15 +298,17 @@ async function buildSummary() {
 
   const current = days[days.length - 1];
   const rankData = await loadRank(current);
-  const tools = buildTools(current);
+  const displayScore = rankData?.score || current.raw;
+  const displayCurrent = { ...current, raw: displayScore };
+  const tools = buildTools(current, rankData);
   const streak = calculateStreak(days);
   const levelSize = 25_000_000;
-  const xp = current.raw % levelSize;
+  const xp = displayScore % levelSize;
   const primary = tools[0];
   const history = days.slice(-7).map((day) => ({
     date: day.date,
     label: day.date === current.date ? "今天" : day.date.slice(5).replace("-", "/"),
-    normalized: day.raw
+    normalized: day.date === current.date ? displayScore : day.raw
   }));
 
   return {
@@ -312,21 +316,23 @@ async function buildSummary() {
     mode: "local",
     generatedAt: new Date().toISOString(),
     date: current.date,
-    sourceNote: rankData?.rank ? `来自 ${path.basename(bin)} 预览，已匹配生财榜单` : `来自 ${path.basename(bin)} 预览，未匹配榜单`,
+    sourceNote: rankData?.rank
+      ? `已匹配生财榜单，本机预览 ${formatCount(current.raw)}`
+      : `来自 ${path.basename(bin)} 预览，未匹配榜单`,
     normalized: current.normalized,
     raw: current.raw,
     input: current.input,
     output: current.output,
     cache: current.cache,
-    totalLabel: formatCount(current.raw),
+    totalLabel: formatCount(displayScore),
     rawLabel: formatCount(current.raw),
     rank: rankData?.rank || null,
     rankLabel: rankData?.rank ? `#${rankData.rank}` : "#--",
     gapLabel: rankData?.gap ? formatCount(rankData.gap) : "",
     leadLabel: rankData?.lead ? formatCount(rankData.lead) : "",
     rankDelta: 0,
-    level: Math.max(1, Math.floor(current.raw / levelSize) + 1),
-    levelTitle: `建造者等级 ${Math.max(1, Math.floor(current.raw / levelSize) + 1)}`,
+    level: Math.max(1, Math.floor(displayScore / levelSize) + 1),
+    levelTitle: `建造者等级 ${Math.max(1, Math.floor(displayScore / levelSize) + 1)}`,
     xp,
     xpMax: levelSize,
     xpPct: Math.max(4, Math.round((xp / levelSize) * 100)),
@@ -335,8 +341,8 @@ async function buildSummary() {
     primaryTool: primary?.label || "等待数据",
     primaryToolShareLabel: primary ? formatPercent(primary.share) : "0%",
     tools,
-    quests: buildQuests(current, rankData, tools),
-    badges: buildBadges(current, rankData, streak, tools),
+    quests: buildQuests(displayCurrent, rankData, tools),
+    badges: buildBadges(displayCurrent, rankData, streak, tools),
     history,
     behaviorSignals: await githubSignals()
   };
