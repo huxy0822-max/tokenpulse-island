@@ -20,4 +20,4 @@ Because the upstream repository has no license declaration, this project does no
 - A local Node bridge that can read `opentoken preview --json`
 - Feedback loops for daily score, rank pressure, quests, achievements, tool mix, and GitHub behavior signals
 - No automatic rewrite of the user's existing OpenToken webhook
-
+- MIT-licensed original code

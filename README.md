@@ -4,6 +4,8 @@ TokenPulse Island is our web-first version of the OpenToken feedback idea. It tu
 
 The app is built from scratch after reviewing `ehomekevin/opentoken-island`. The upstream project has no license declaration, so this repository does not reuse its code.
 
+License: MIT.
+
 ## Run
 
 ```bash
@@ -34,4 +36,3 @@ OPENTOKEN_BIN=/Users/huxy/.local/bin/opentoken npm start
 ## Deploy
 
 Static hosting works because the browser falls back to demo data when `/api/summary` is not present. For a local real-data install, run the Node bridge on the Mac that has OpenToken installed.
-
