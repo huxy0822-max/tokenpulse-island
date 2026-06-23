@@ -6,6 +6,8 @@ The app is built from scratch after reviewing `ehomekevin/opentoken-island`. The
 
 License: MIT.
 
+Live: https://tokenpulse.huxy.club
+
 ## Run
 
 ```bash
