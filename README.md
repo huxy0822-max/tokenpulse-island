@@ -35,6 +35,16 @@ Configure a custom OpenToken binary if needed:
 OPENTOKEN_BIN=/Users/huxy/.local/bin/opentoken npm start
 ```
 
+## macOS Menu Bar App
+
+Install the native menu bar shell:
+
+```bash
+bash scripts/install-macos-app.sh
+```
+
+The installer builds `/Applications/TokenPulse Island.app`, opens it, and uses the local service at `http://127.0.0.1:4188`. The app stays in the menu bar, shows the latest token total, and opens the local dashboard in a popover when clicked.
+
 ## Deploy
 
 Static hosting works because the browser falls back to demo data when `/api/summary` is not present. For a local real-data install, run the Node bridge on the Mac that has OpenToken installed.
